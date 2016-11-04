@@ -1,6 +1,6 @@
 # Layer-wise supervised incremental training of residual networks
 
-[AI-ON.org](ai-on.org) open research project.
+[AI-ON.org](http://ai-on.org) open research project.
 
 Date: October 2016 - Category: Fundamental Research - [Mailing list](https://groups.google.com/forum/#!forum/aion-incremental-training-of-residual-networks)
 
