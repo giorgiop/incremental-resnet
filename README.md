@@ -25,3 +25,4 @@ Efficient layer-wise training of deep networks could allow to significantly spee
 2. [Residual Networks are Exponential Ensembles of Relatively Shallow Networks](https://arxiv.org/abs/1605.06431)
 3. [Net2Net: Accelerating Learning via Knowledge Transfer](https://arxiv.org/abs/1511.05641)
 4. [Progressive Neural Networks](https://arxiv.org/abs/1606.04671)
+5. [Network Morphism](https://arxiv.org/pdf/1603.01670.pdf)
