@@ -9,7 +9,7 @@ from keras.utils import np_utils
 
 batch_size = 32
 nb_classes = 10
-nb_epoch = 200
+nb_epochs = 200
 data_augmentation = True
 
 # input image dimensions
@@ -147,11 +147,7 @@ class ResnetBuilder(object):
     def build_resnet_152(input_shape, num_outputs):
         return ResnetBuilder.build(input_shape, num_outputs, bottleneck, [3, 8, 36, 3])
         
-def main():
-    model = ResnetBuilder.build_resnet_50((3, 224, 224), 1000)
-    model.compile(loss="categorical_crossentropy", optimizer="sgd")
-    model.summary()
-
+    
 if __name__ == '__main__':
     (X_train, y_train), (X_test, y_test) = cifar10.load_data()
     print('X_train shape:', X_train.shape)
@@ -165,5 +161,11 @@ if __name__ == '__main__':
 
     Y_train = np_utils.to_categorical(y_train, nb_classes)
     Y_test = np_utils.to_categorical(y_test, nb_classes)
-    main()
+    model = ResnetBuilder.build_resnet_50((3, 224, 224), 1000)
+    model.compile(loss="categorical_crossentropy", optimizer="sgd")
+    print(model.summary())
+    model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=nb_epochs, batch_size)
+    score = model.evaluate(X_test, y_test, verbose=0)
+    print("Accuracy: %.2f%%" % (score[1]*100))
+
 
