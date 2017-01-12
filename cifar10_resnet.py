@@ -26,6 +26,16 @@ def _conv_bn_relu(nb_filter, nb_row, nb_col, subsample=(1, 1)):
 
     return f
 
+
+def _conv_bn_relu(nb_filter, nb_row, nb_col, subsample=(1, 1)):
+    def f(input):
+        conv = Convolution2D(nb_filter=nb_filter, nb_row=nb_row, nb_col=nb_col, subsample=subsample,
+                             init="he_normal", border_mode="same")(input)
+        norm = BatchNormalization(mode=0, axis=CHANNEL_AXIS)(conv)
+        return Activation("relu")(norm)
+
+    return f
+
 def _shortcut(input, residual):
     # Expand channels of shortcut to match residual.
     # Stride appropriately to match residual (width, height)
@@ -64,6 +74,17 @@ def basic_block(nb_filters, init_subsample=(1, 1)):
         return _shortcut(input, residual)
 
     return f
+
+def bottleneck(nb_filters, init_subsample=(1, 1)):
+    def f(input):
+        conv_1_1 = _bn_relu_conv(nb_filters, 1, 1, subsample=init_subsample)(input)
+        conv_3_3 = _bn_relu_conv(nb_filters, 3, 3)(conv_1_1)
+        residual = _bn_relu_conv(nb_filters * 4, 1, 1)(conv_3_3)
+        return _shortcut(input, residual)
+
+    return f
+
+
 
 class ResnetBuilder(object):
     @staticmethod
@@ -127,7 +148,7 @@ class ResnetBuilder(object):
         return ResnetBuilder.build(input_shape, num_outputs, bottleneck, [3, 8, 36, 3])
         
 def main():
-    model = ResnetBuilder.build_resnet_34((3, 224, 224), 1000)
+    model = ResnetBuilder.build_resnet_50((3, 224, 224), 1000)
     model.compile(loss="categorical_crossentropy", optimizer="sgd")
     model.summary()
 
