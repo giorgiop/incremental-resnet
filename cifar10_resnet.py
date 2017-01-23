@@ -17,15 +17,17 @@ img_rows, img_cols = 32, 32
 # The CIFAR10 images are RGB.
 img_channels = 3
 
-def _conv_bn_relu(nb_filter, nb_row, nb_col, subsample=(1, 1)):
-    def f(input):
-        conv = Convolution2D(nb_filter=nb_filter, nb_row=nb_row, nb_col=nb_col, subsample=subsample,
-                             init="he_normal", border_mode="same")(input)
-        norm = BatchNormalization(mode=0, axis=CHANNEL_AXIS)(conv)
-        return Activation("relu")(norm)
-
-    return f
-
+def _bn_relu_conv(**conv_params):
+    """Helper to build a BN -> relu -> conv block.
+    This is an improved scheme proposed in http://arxiv.org/pdf/1603.05027v2.pdf
+    """
+    nb_filter = conv_params["nb_filter"]
+    nb_row = conv_params["nb_row"]
+    nb_col = conv_params["nb_col"]
+    subsample = conv_params.setdefault("subsample", (1,1))
+    init = conv_params.setdefault("init", "he_normal")
+    border_mode = conv_params.setdefault("border_mode", "same")
+    W_regularizer = conv_params.setdefault("W_regularizer", l2(1.e-4))
 
 def _conv_bn_relu(nb_filter, nb_row, nb_col, subsample=(1, 1)):
     def f(input):
@@ -83,6 +85,19 @@ def bottleneck(nb_filters, init_subsample=(1, 1)):
         return _shortcut(input, residual)
 
     return f
+
+def handle_dim_ordering():
+    global ROW_AXIS
+    global COL_AXIS
+    global CHANNEL_AXIS
+    if K.image_dim_ordering() == 'tf':
+        ROW_AXIS = 1
+        COL_AXIS = 2
+        CHANNEL_AXIS = 3
+    else:
+        CHANNEL_AXIS = 1
+        ROW_AXIS = 2
+        COL_AXIS = 3
 
 
 
