@@ -17,6 +17,12 @@ img_rows, img_cols = 32, 32
 # The CIFAR10 images are RGB.
 img_channels = 3
 
+def _bn_relu(input):
+    """Helper to build a BN -> relu block
+    """
+    norm = BatchNormalization(mode=0, axis=CHANNEL_AXIS)(input)
+    return Activation("relu")(norm)
+
 def _bn_relu_conv(**conv_params):
     """Helper to build a BN -> relu -> conv block.
     This is an improved scheme proposed in http://arxiv.org/pdf/1603.05027v2.pdf
@@ -98,6 +104,14 @@ def handle_dim_ordering():
         CHANNEL_AXIS = 1
         ROW_AXIS = 2
         COL_AXIS = 3
+
+def _get_block(identifier):
+    if isinstance(identifier, six.string_types):
+        res = globals().get(identifier)
+        if not res:
+            raise ValueError('Invalid {}'.format(identifier))
+        return res
+    return identifier
 
 
 
